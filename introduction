@@ -1,0 +1,31 @@
+
+
+1 I eat an apple
+
+
+2 i eat an apple 
+
+
+3 ("i","eat","an","apple")
+
+
+4 (("pron.",),("v.",),("art.",),("n.",))
+
+
+
+model = [(("pron.","v.","art.","n."),"$1pron.split$ $1v.split$ ,yes?"),(("pron.","v.","art.","n."),"$1pron.split$ $1v.split$ ,oh!")]
+
+reality -> [(('pron.', 'v.', 'art.', 'n.'), '$$')]
+
+5 search_model -> ((("pron.","v.","art.","n."),"$1pron.split$ $1v.split$ ,yes"),)
+
+
+6 say ~~~~~~~~~~~~~~
+
+
+
+
+
+
+
+-------------------

@@ -13,14 +13,11 @@ from lomlbase.analog_socket import Talk,Speaker
 class Loml(Speaker):
 	def __init__(self):
 		Speaker.__init__(self,"loml")
-		self.model = Model()
 
 	def brain(self,speaker_name,speaker_content):
-		xpt = format_string_xpt(speaker_content)
-		print("1 turn string into properties list         ",xpt)
-		print("2 get all the model                        ",self.model.MODEL_ALL)
-		print("3 see which is fit                         ",self.model.search_model(xpt))
+		
 
+		
 		# content = speaker_content.lower()
 		# content_split = content.split()
 
