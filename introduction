@@ -29,3 +29,5 @@ reality -> [(('pron.', 'v.', 'art.', 'n.'), '$$')]
 
 
 -------------------
+								I 												eat
+[[( 1 , property , attr , W_obj) , ( 1 , property , attr , W_obj)] ,( 2 , property , attr , W_obj)]
