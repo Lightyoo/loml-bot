@@ -13,7 +13,6 @@ def property_expression_to_property_f1tuple(property_expression):
 
 
 class Words:
-
 	class W:
 		def __init__(self,split,antisense=""):
 			self.split = split.lower()
@@ -32,6 +31,7 @@ class Words:
 
 	# num.
 	NUMERAL = [
+		W("an"),
 		W("two"),
 		W("three"),
 		W("four")
@@ -59,6 +59,11 @@ class Words:
 
 	# prep.
 	PREPOSITION = []
+
+
+
+	W_PROPERTY = ["split","antisense"]
+	ALL_PROPERTIES = [NOUNS,PRONOUN,NUMERAL,ADJECTIVE,ADVERB,VERB,ARTICLE,PREPOSITION]
 
 
 class Model:
@@ -118,7 +123,58 @@ class Model:
 
 def format_string(string):
 	result = tuple(string.lower().split(" "))
-	return result
+
+	new = []
+	'''
+	[[],[],[],[]]
+	'''
+
+	for index,word in enumerate(result):
+		# word -> i or eat or an or ...
+		# search it in the whole words
+		new.append([])
+		for property_of_wordlist in Words.ALL_PROPERTIES:
+			# property_of_wordlist -> NOUNS,PRONOUN,NUMERAL,ADJECTIVE,ADVERB,VERB,ARTICLE,PREPOSITION
+
+			for wordobj in property_of_wordlist:
+				# wordobj -> W("eat"),W("buy"),W("throw")
+
+				for attr in Words.W_PROPERTY:
+					# attr -> "split","antisense"
+
+					if getattr(wordobj,attr) == word:
+						if property_of_wordlist == Words.NOUNS:
+							property_ = "n."
+
+						elif property_of_wordlist == Words.PRONOUN:
+							property_ = "pron."
+
+						elif property_of_wordlist == Words.NUMERAL:
+							property_ = "num."
+
+						elif property_of_wordlist == Words.ADJECTIVE:
+							property_ = "adj."
+
+						elif property_of_wordlist == Words.ADVERB:
+							property_ = "adv."
+
+						elif property_of_wordlist == Words.VERB:
+							property_ = "v."
+
+						elif property_of_wordlist == Words.ARTICLE:
+							property_ = "art."
+
+						elif property_of_wordlist == Words.PREPOSITION:
+							property_ = "prep."
+
+						else:
+							property_ = "none."
+
+						new[index].append(("index",property_,attr,wordobj))
+
+	return new
+
+
 
 def string_to_numproperty_wordobj_tuple(split_string):
 	# numproperty_wordobj_tuple : (("1pron.",Word(split="i")),)
@@ -207,6 +263,7 @@ def to_property_f2tuple(split_string):
 def auto_apply(string):
 	# lower string
 	string = format_string(string)
+	print(string)
 
 	'''
 	(
