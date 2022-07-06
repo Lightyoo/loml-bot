@@ -1,10 +1,7 @@
 import re
 
 
-
-
-
-
+# create lots of Words
 
 class Words:
 	class W:
@@ -17,12 +14,14 @@ class Words:
 	# n.
 	NOUNS = [
 		W(split="apple",complex="apples"),
-		W("pear")
+		W("pear"),
+		W(split="pig",complex="pigs")
 		]
 
 	# pron.
 	PRONOUN = [
-		W("i",antisense="you")
+		W("i",antisense="you"),
+		W("you",antisense="i")
 		]
 
 	# num.
@@ -30,7 +29,9 @@ class Words:
 		W("an"),
 		W("two"),
 		W("three"),
-		W("four")
+		W("four"),
+		W("five"),
+		W("six")
 		]
 
 	# adj.
@@ -62,325 +63,270 @@ class Words:
 	ALL_PROPERTIES = [NOUNS,PRONOUN,NUMERAL,ADJECTIVE,ADVERB,VERB,ARTICLE,PREPOSITION]
 
 
-class Model:
-	def __init__(self):
-		self.MODEL_ALL = []
+def format(string=""):
+	string = tuple(string.lower().split(" "))
+	# ("i","eat","an","apple")
+	
+	'''
+	the program will walk the whole tuple
+	'''
 
-		self.add_model("pron.v.art.n.","yes, $1pron.antisense$ $1v.split$")
-		self.add_model("pron.v.art.n.","$1pron.antisense$ $1v.split$ $1art.split$ $1n.split$?")
+	for word in string:
+		# word -> i | eat | an | apple
+		# if word in the large words list , the program will turn the common word string into difficult WordObj
+		# for example(if we dont know what's 'apple')
+		# (i , eat , an ,apple)
+		# and after handling,it becomes ["i"]
 
-	def add_model(self,property_expression,reply_expession):
-		property_f1tuple = property_expression_to_property_f1tuple(property_expression)
-		self.MODEL_ALL.append((property_f1tuple,reply_expession))
+if __name__ == '__main__':
+	string = "I eat an apple"
 
-	def match(self,model_property_f1tuple,property_f2tuple):
-		'''
-		('pron.', 'v.', 'art.', 'n.')
-		&
-		(('pron.',), ('v.',), ('art.',), ('n.',))
-		=
-		True
-		return ...
-		'''
-		for index,property_tuple in enumerate(property_f2tuple):
-			if model_property_f1tuple[index] not in property_tuple:
-				return False
-		else:
-			return True
 
-	def search(self,property_f2tuple):
-		fit = []
 
-		for model in self.MODEL_ALL:
-			if self.match(model[0],property_f2tuple):
-				fit.append(model[1])
 
-		return tuple(fit)
 
-	def replace(self,reply_expession,numproperty_wordobj_tuple):
-		'''
-		reply_expression : "$1pron.split$ $1v.split$"
-		numproperty_wordobj_tuple : ((("1pron.",),(Word(split="i"),)),)
 
-		'''
 
-		all_sub = re.findall(r"(\w+\.)(\w+)",reply_expession)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# def format_string(string):
+# 	result = tuple(string.lower().split(" "))
+
+# 	new = []
+
+# 	for i in range(len(result)):
+# 		new.append([])
+# 	'''
+# 	[[],[],[],[]]
+# 	'''
+
+# 	new_empty_index = []
+
+# 	for index,word in enumerate(result):
+# 		# word -> i or eat or an or ...
+# 		# search it in the whole words
+
+# 		for property_of_wordlist in Words.ALL_PROPERTIES:
+# 			# property_of_wordlist -> NOUNS,PRONOUN,NUMERAL,ADJECTIVE,ADVERB,VERB,ARTICLE,PREPOSITION
+
+# 			for wordobj in property_of_wordlist:
+# 				# wordobj -> W("eat"),W("buy"),W("throw")
+
+# 				for attr in Words.W_PROPERTY:
+# 					# attr -> "split","antisense"
+
+# 					if getattr(wordobj,attr) == word:
+# 						property_ = ""
+
+# 						if property_of_wordlist == Words.NOUNS:
+# 							property_ = "n."
+
+# 						elif property_of_wordlist == Words.PRONOUN:
+# 							property_ = "pron."
+
+# 						elif property_of_wordlist == Words.NUMERAL:
+# 							property_ = "num."
+
+# 						elif property_of_wordlist == Words.ADJECTIVE:
+# 							property_ = "adj."
+
+# 						elif property_of_wordlist == Words.ADVERB:
+# 							property_ = "adv."
+
+# 						elif property_of_wordlist == Words.VERB:
+# 							property_ = "v."
+
+# 						elif property_of_wordlist == Words.ARTICLE:
+# 							property_ = "art."
+
+# 						elif property_of_wordlist == Words.PREPOSITION:
+# 							property_ = "prep."
+
+# 						new[index].append([property_,attr,wordobj])
+# 						# break # jump out of attr in Words.W_PROPERTY
+
+# 		if new[index] == []:
+# 			new_empty_index.append(index)
+
+
+# 	for empty_index in new_empty_index:
+# 		del new[empty_index]
+
+# 	# for index,e in enumerate(new):
+# 	# 	if e == []:
+# 	# 		del new[index]
+
+# 	return new
+
+
+
+# class Model:
+# 	def __init__(self):
+# 		self.MODEL_ALL = []
+
+# 		self.add_model("$1pron.split$ $1v.split$ $1art.split$ $1n.split$","yes, $1pron.antisense$ $1v.split$")
+# 		self.add_model("$1pron.split$ $1v.split$ $1art.split$ $1n.split$","$1pron.antisense$ $1v.split$ $1art.split$ $1n.split$?")
+# 		self.add_model("$1pron.split$ $1v.split$ $1art.split$ $1adj.split$ $1n.split$","$1pron.antisense$ $1v.split$ $1art.split$ $1n.split$?")
+# 		self.add_model("do $1pron.split$","yes")
+
+# 	def add_model(self,s_expresssion,reply_s_expession):
+# 		self.MODEL_ALL.append([self.format_model(s_expresssion),reply_s_expession])
+
+# 	def format_model(self,s_expresssion):
+# 		'''
+# 		(('1pron.', '1v.', '1art.', '1n.'), 'yes, $1pron.antisense$ $1v.split$')
+
+# 		'''
+
+# 		return re.findall(r"\$([0-9]+)(\w+\.)(\w+)\$",s_expresssion)
+
+# 	def match(self,format_string,format_model):
+# 		'''
+# 		[[('pron.', 'split', <__main__.Words.W object at 0xffffaecb7340>)], 
+# 		[('v.', 'split', <__main__.Words.W object at 0xffffaecabee0>)], [(
+# 		'num.', 'split', <__main__.Words.W object at 0xffffaecb71f0>), ('ar
+# 		t.', 'split', <__main__.Words.W object at 0xffffaecabd60>)], [('n.'
+# 		, 'split', <__main__.Words.W object at 0xffffaecb75b0>)]]
+
+# 		((('1', 'pron.', 'split'), ('1', 'v.', 'split'), ('1', 'art.', 'split'), ('1', 'n.', 'split')), 'yes, $1pron.antisense$ $1v.split$')
+# 		'''
+# 		print(format_model)
+
+
+# 		if len(format_string) == len(format_model[0]):
+# 			for index,list_p_a_w in enumerate(format_string):
+# 				# list_p_a_w -> [('pron.', 'split', <__main__.Words.W object at 0xffff9a2d12e0>)]
+# 				for p_a_w in list_p_a_w:
+# 					# p_a_w -> ('pron.', 'split', <__main__.Words.W object at 0xffff9a2d12e0>)
+
+# 					if format_model[0][index][1] == p_a_w[0] and format_model[0][index][2] == p_a_w[1]:
+
+# 						format_model[0][index] = format_model[0][index][0],format_model[0][index][1],p_a_w[2]
+
+# 						if str(type(p_a_w[2])) != "<class 'str'>":
+# 							break
+
+# 				else:
+# 					return None
+# 		else:
+# 			return None
+
+# 		return format_model
+
+# 	def search(self,format_string):
+# 		fit = []
+
+# 		for format_model in self.MODEL_ALL:
+# 			result = self.match(format_string,format_model)
+# 			if result != None:
+# 				print(result)
+# 				fit.append(result)
+
+# 		return tuple(fit)
+
+# 	def replace(self,format_info,reply_s_expession):
+# 		'''
+# 		reply_expression : "$1pron.split$ $1v.split$"
+# 		numproperty_wordobj_tuple : ((("1pron.",),(Word(split="i"),)),)
+
+# 		'''
+
+# 		print(format_info)
+# 		print(reply_s_expession)
+
+# 		needto_sub = dict(re.findall(r"\$([0-9]+\w+\.)(\w+)\$",reply_s_expession))
+# 		# print(needto_sub)
+
+# 		for replaced in needto_sub:
+# 			'''
+# 			replaced : ("1","pron.","antisense")
+# 			'''
+# 			...
+
+# 		for p_a_w in format_info:
+# 			if f"{p_a_w[0]}{p_a_w[1]}" in needto_sub:
+# 				reply_s_expession = re.sub(rf"\${p_a_w[0]}{p_a_w[1]}\w+\$",getattr(p_a_w[2],needto_sub[f"{p_a_w[0]}{p_a_w[1]}"],"x"),reply_s_expession)
+
+# 		return reply_s_expession
+
 		
-		reply = reply_expession
 
-		for numproperty,value in all_sub:
-			for np_wo_f2tuple in numproperty_wordobj_tuple:
-				for index,numproperty_in_f2tuple in enumerate(np_wo_f2tuple[0]):
-					if numproperty == numproperty_in_f2tuple:
-						reply = re.sub(f"\${numproperty}{value}\$",getattr(np_wo_f2tuple[1][index],value,"x"),reply)
+# def auto_reply(string):
+# 	# print(format_string("I love eating apples"))
+# 	string = format_string(string)
+# 	print(string)
 
-		return reply
+# 	model = Model()
+# 	print("all the models",model.MODEL_ALL)
+
+# 	all_reply = []
+
+# 	for i in model.search(string):
+# 		all_reply.append(model.replace(i[0],i[1]))
+
+# 	return all_reply
 
 
 
-
-
-
-def string_to_numproperty_wordobj_tuple(split_string):
-	# numproperty_wordobj_tuple : (("1pron.",Word(split="i")),)
-	numproperty_wordobj_list = []
-
-	n = 0
-	pron = 0
-	num = 0
-	adj = 0
-	adv = 0
-	v = 0
-	art = 0
-	prep = 0
-
-	for index,word in enumerate(split_string):
-		pro = []
-		word_obj = []
-		if word in [word.split for word in Words.NOUNS]:
-			n += 1
-			pro.append(f"{n}n.") 
-			word_obj.append([wordobj for wordobj in Words.NOUNS if wordobj.split == word][0])
-		if word in [word.split for word in Words.PRONOUN]:
-			pron += 1 
-			pro.append(f"{pron}pron.") 
-			word_obj.append([wordobj for wordobj in Words.PRONOUN if wordobj.split == word][0])
-		if word in [word.split for word in Words.NUMERAL]:
-			num += 1
-			pro.append(f"{num}num.") 
-			word_obj.append([wordobj for wordobj in Words.NUMERAL if wordobj.split == word][0])
-		if word in [word.split for word in Words.ADJECTIVE]:
-			adj += 1
-			pro.append(f"{adj}adj.") 
-			word_obj.append([wordobj for wordobj in Words.ADJECTIVE if wordobj.split == word][0])
-		if word in [word.split for word in Words.ADVERB]:
-			adv += 1
-			pro.append(f"{adv}adv.") 
-			word_obj.append([wordobj for wordobj in Words.ADVERB if wordobj.split == word][0])
-		if word in [word.split for word in Words.VERB]:
-			v += 1
-			pro.append(f"{v}v.") 
-			word_obj.append([wordobj for wordobj in Words.VERB if wordobj.split == word][0])
-		if word in [word.split for word in Words.ARTICLE]:
-			art += 1
-			pro.append(f"{art}art.")
-			word_obj.append([wordobj for wordobj in Words.ARTICLE if wordobj.split == word][0]) 
-		if word in [word.split for word in Words.PREPOSITION]:
-			prep += 1
-			pro.append(f"{prep}prep.") 
-			word_obj.append([wordobj for wordobj in Words.PREPOSITION if wordobj.split == word][0])
-
-		numproperty_wordobj_list.append((tuple(pro),tuple(word_obj)))
-
-	return tuple(numproperty_wordobj_list)
-
-def to_property_f2tuple(split_string):
-	'''
-	('i', 'eat', 'an', 'apple')
-	become 
-	(('pron.',), ('v.',), ('art.',), ('n.',))
-	'''
-	property_list = []
-
-	for index,word in enumerate(split_string):
-		pro = []
-		if word in [word.split for word in Words.NOUNS]:
-			pro.append("n.") 
-		elif word in [word.split for word in Words.PRONOUN]:
-			pro.append("pron.") 
-		elif word in [word.split for word in Words.NUMERAL]:
-			pro.append("num.") 
-		elif word in [word.split for word in Words.ADJECTIVE]:
-			pro.append("adj.") 
-		elif word in [word.split for word in Words.ADVERB]:
-			pro.append("adv.") 
-		elif word in [word.split for word in Words.VERB]:
-			pro.append("v.") 
-		elif word in [word.split for word in Words.ARTICLE]:
-			pro.append("art.") 
-		elif word in [word.split for word in Words.PREPOSITION]:
-			pro.append("prep.") 
-
-		property_list.append(tuple(pro))
-
-	return tuple(property_list)
-
-def auto_apply(string):
-	# lower string
-	string = format_string(string)
-	print(string)
-
-	'''
-	(
-	    (
-	    	('1pron.',), (<__main__.Words.W object at 0xffffa4579040>,)
-	    ),(
-	    	('1v.',), (<__main__.Words.W object at 0xffffa456de80>,)
-	    ),(
-	    	('1art.',), (<__main__.Words.W object at 0xffffa456dc70>,)
-	    ),(
-	    	('1n.',), (<__main__.Words.W object at 0xffffa4579490>,)
-	    )
-	)
-	'''
-	numproperty_wordobj_tuple = string_to_numproperty_wordobj_tuple(string)
-
-	# (('pron.',), ('v.',), ('art.',), ('n.',))
-	string = to_property_f2tuple(string)
-
-	model = Model()
-	model_all = model.MODEL_ALL
-
-	# ('yes, $1pron.antisense$ $1v.split$', '$1pron.antisense$ $1v.split$ $1art.split$ $1n.split$?')
-	search_result = model.search(string)
-
-	return tuple([model.replace(search_r,numproperty_wordobj_tuple) for search_r in search_result])
 
 
 # if __name__ == '__main__':
-# 	string = "I eat an apple"
-# 	print(auto_apply(string))
-
-
-def format_string(string):
-	result = tuple(string.lower().split(" "))
-
-	new = []
-	'''
-	[[],[],[],[]]
-	'''
-
-	for index,word in enumerate(result):
-		# word -> i or eat or an or ...
-		# search it in the whole words
-		new.append([])
-		for property_of_wordlist in Words.ALL_PROPERTIES:
-			# property_of_wordlist -> NOUNS,PRONOUN,NUMERAL,ADJECTIVE,ADVERB,VERB,ARTICLE,PREPOSITION
-
-			for wordobj in property_of_wordlist:
-				# wordobj -> W("eat"),W("buy"),W("throw")
-
-				for attr in Words.W_PROPERTY:
-					# attr -> "split","antisense"
-
-					if getattr(wordobj,attr) == word:
-						property_ = []
-
-						if property_of_wordlist == Words.NOUNS:
-							property_ = "n."
-
-						elif property_of_wordlist == Words.PRONOUN:
-							property_ = "pron."
-
-						elif property_of_wordlist == Words.NUMERAL:
-							property_ = "num."
-
-						elif property_of_wordlist == Words.ADJECTIVE:
-							property_ = "adj."
-
-						elif property_of_wordlist == Words.ADVERB:
-							property_ = "adv."
-
-						elif property_of_wordlist == Words.VERB:
-							property_ = "v."
-
-						elif property_of_wordlist == Words.ARTICLE:
-							property_ = "art."
-
-						elif property_of_wordlist == Words.PREPOSITION:
-							property_ = "prep."
-
-						new[index].append([property_,attr,wordobj])
-
-	return new
+# 	print(auto_reply("I love eating you"))
 
 
 
 
-class Model:
-	def __init__(self):
-		self.MODEL_ALL = []
-
-		self.add_model("$1pron.split$ $1v.split$ $1art.split$ $1n.split$","yes, $1pron.antisense$ $1v.split$")
-		self.add_model("$1pron.split$ $1v.split$ $1art.split$ $1n.split$","$1pron.antisense$ $1v.split$ $1art.split$ $1n.split$?")
-		self.add_model("$1pron.split$ $1v.split$ $1art.split$ $1adj.split$ $1n.split$","$1pron.antisense$ $1v.split$ $1art.split$ $1n.split$?")
-
-	def add_model(self,s_expresssion,reply_s_expession):
-		self.MODEL_ALL.append([self.format_model(s_expresssion),reply_s_expession])
-
-	def format_model(self,s_expresssion):
-		'''
-		(('1pron.', '1v.', '1art.', '1n.'), 'yes, $1pron.antisense$ $1v.split$')
-
-		'''
-
-		return re.findall(r"\$([0-9]+)(\w+\.)(\w+)\$",s_expresssion)
-
-	def match(self,format_string,format_model):
-		'''
-		[[('pron.', 'split', <__main__.Words.W object at 0xffffaecb7340>)], 
-		[('v.', 'split', <__main__.Words.W object at 0xffffaecabee0>)], [(
-		'num.', 'split', <__main__.Words.W object at 0xffffaecb71f0>), ('ar
-		t.', 'split', <__main__.Words.W object at 0xffffaecabd60>)], [('n.'
-		, 'split', <__main__.Words.W object at 0xffffaecb75b0>)]]
-
-		((('1', 'pron.', 'split'), ('1', 'v.', 'split'), ('1', 'art.', 'split'), ('1', 'n.', 'split')), 'yes, $1pron.antisense$ $1v.split$')
-		'''
-		for index,list_p_a_w in enumerate(format_string):
-			# list_p_a_w -> [('pron.', 'split', <__main__.Words.W object at 0xffff9a2d12e0>)]
-			for p_a_w in list_p_a_w:
-				# p_a_w -> ('pron.', 'split', <__main__.Words.W object at 0xffff9a2d12e0>)
-
-				if format_model[0][index][1] == p_a_w[0] and format_model[0][index][2] == p_a_w[1]:
-
-					format_model[0][index] = format_model[0][index][0],format_model[0][index][1],p_a_w[2]
-					break
-
-			else:
-				return None
-
-		return format_model
-
-	def search(self,format_string):
-		fit = []
-
-		for format_model in self.MODEL_ALL:
-			result = self.match(format_string,format_model)
-			if result != None:
-				fit.append(result)
-
-		return tuple(fit)
-
-	def replace(self,format_info,reply_s_expession):
-		'''
-		reply_expression : "$1pron.split$ $1v.split$"
-		numproperty_wordobj_tuple : ((("1pron.",),(Word(split="i"),)),)
-
-		'''
-
-		needto_sub = dict(re.findall(r"\$([0-9]+\w+)\.(\w+)\$",reply_s_expession))
-		print(needto_sub)
-
-		for replaced in needto_sub:
-			'''
-			replaced : ("1","pron.","antisense")
-			'''
-			...
-
-		for p_a_w in format_info:
-			if f"{p_a_w[0]}{p_a_w[1]}" in needto_sub:
-				re.sub(f"\${p_a_w[0]}{p_a_w[1]}\.\w+\$",getattr(p_a_w[2],needto_sub[f"{p_a_w[0]}{p_a_w[1]}"]),reply_s_expession)
-
-		return reply_s_expession
-
-		
 
 
-# print(format_string("I love eating apples"))
-string = format_string("I eat an apple")
-print(string)
-
-model = Model()
-# print("all the models",model.MODEL_ALL)
-for i in model.search(string):
-	print(model.replace(i[0],i[1]))
