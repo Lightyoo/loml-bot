@@ -1,5 +1,5 @@
 import re
-
+from collections import OrderedDict
 
 # create lots of Words
 
@@ -11,10 +11,10 @@ class Words:
 			self.complex = complex.lower()
 			self.present = present.lower()
 
-			self.word_property = ""
+			self.wp = ""
 
 	# n.
-	NOUNS = [
+	_NOUNS = [
 		W(split="apple",complex="apples"),
 		W("pear"),
 		W(split="pig",complex="pigs"),
@@ -22,13 +22,13 @@ class Words:
 		]
 
 	# pron.
-	PRONOUN = [
+	_PRONOUN = [
 		W("i",antisense="you"),
 		W("you",antisense="i")
 		]
-
+	
 	# num.
-	NUMERAL = [
+	_NUMERAL = [
 		W("an"),
 		W("two"),
 		W("three"),
@@ -38,7 +38,7 @@ class Words:
 		]
 
 	# adj.
-	ADJECTIVE = [
+	_ADJECTIVE = [
 		W("nice"),
 		W("terrible"),
 		W("excited"),
@@ -47,10 +47,10 @@ class Words:
 		]
 
 	# adv.
-	ADVERB = []
+	_ADVERB = []
 
 	# v.
-	VERB = [
+	_VERB = [
 		W(split="eat",present="eating"),
 		W(split="love"),
 		W("buy"),
@@ -61,33 +61,129 @@ class Words:
 	################ FAKE WORD
 
 	# art.
-	ARTICLE = [
+	_ARTICLE = [
 		W("an")
 		]
 
 	# prep.
-	PREPOSITION = [
+	_PREPOSITION = [
 		W("on"),
 		W("in")
 		]
 
 
 	W_PROPERTY = ["split","antisense","complex","present"]
-	ALL_PROPERTIES = {
-		"n."   :  NOUNS,
-		"pron.":  PRONOUN,
-		"num." :  NUMERAL,
-		"adj." :  ADJECTIVE,
-		"adv." :  ADVERB,
-		"v."   :  VERB,
-		"art." :  ARTICLE,
-		"prep" :  PREPOSITION
+
+	_ALL_PROPERTIES = {
+		"n."   :  _NOUNS,
+		"pron.":  _PRONOUN,
+		"num." :  _NUMERAL,
+		"adj." :  _ADJECTIVE,
+		"adv." :  _ADVERB,
+		"v."   :  _VERB,
+		"art." :  _ARTICLE,
+		"prep" :  _PREPOSITION
 		}
 
-	for word_property_,word_list in ALL_PROPERTIES.items():
+	for wp_,word_list in _ALL_PROPERTIES.items():
 		
 		for word in word_list:
-			word.word_property = word_property_
+			word.wp = wp_
+
+	WORD_LIST = _NOUNS + _PRONOUN + _NUMERAL + _ADJECTIVE + _ADVERB + _VERB + _ARTICLE + _PREPOSITION
+
+
+
+class Model:
+	ALL_MODEL = [
+		("pron.split v.split art.split n.split.",{"reply":"0.antisense 1.split 2.split 3.split"})
+	]
+
+
+	def search(self,handled_result,model=ALL_MODEL[0]):
+		models = re.findall(r"(\w+\.\w+)",model[0])
+		print(models,"\n")
+
+		to_match = [(code,handled_result[0][str(code)]["object"]) for code in re.findall("[0-9]+",handled_result[1])]
+		print(to_match,"\n")
+
+		new = []
+
+		if len(models) == len(handled_result[0]):
+			for index,i in enumerate(models):
+				for m,obj in to_match[index][1]:
+					if m == i:
+						handled_result[1] = re.sub(to_match[index][0],m,handled_result[1])
+						new.append((index,obj))
+						break
+
+		print(handled_result[1],"\n")
+
+		print(new,"\n")
+
+		replys = dict(re.findall(r"([0-9]+)\.(\w+)",model[1]["reply"]))
+		print(replys)
+
+		for num,obj in new:
+			model[1]["reply"] = re.sub(rf"{num}.{replys[str(num)]}",getattr(obj,replys[str(num)]),model[1]["reply"])
+
+		print(model[1]["reply"])
+
+
+
+string = "I eat an apple."
+
+string = string.lower()
+
+pattern_word = r"\b\w+\b"
+
+# ['apple', 'eat', 'an', 'i']
+all_word_list = sorted(list(set(re.findall(pattern_word,string))),key=lambda x:x.__len__(),reverse=True)
+
+dictionary = dict()
+
+for index,word in enumerate(all_word_list):
+	string = re.sub(word,str(index),string)
+	dictionary[str(index)] = {"name":word,"object":list()}
+
+	for word_obj in Words.WORD_LIST:
+		for pro in Words.W_PROPERTY:
+			if word == getattr(word_obj,pro):
+				dictionary[str(index)]["object"].append((f"{word_obj.wp}{pro}",word_obj))
+
+
+handled_result = [dictionary,string]
+
+print(handled_result,"\n")
+
+model = Model()
+model.search(handled_result)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
