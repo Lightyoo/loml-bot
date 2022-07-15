@@ -1,4 +1,5 @@
 import re
+import random
 from collections import OrderedDict
 
 # create lots of Words
@@ -96,72 +97,91 @@ class Words:
 
 class Model:
 	ALL_MODEL = [
-		("pron.split v.split art.split n.split.",{"reply":"0.antisense 1.split 2.split 3.split"})
+		("pron.split v.split art.split n.split.",{"reply":["0.antisense 1.split 2.split 3.split?","Ah!0.antisense 1.split"]})
 	]
 
 
-	def search(self,handled_result,model=ALL_MODEL[0]):
+	def match(self,handled_result,model=ALL_MODEL[0]):
+		# print(handled_result)
+		# print(model)
+
+		# print("\n\n")
+
+
 		models = re.findall(r"(\w+\.\w+)",model[0])
-		print(models,"\n")
+		# print(models,"\n")
 
-		to_match = [(code,handled_result[0][str(code)]["object"]) for code in re.findall("[0-9]+",handled_result[1])]
-		print(to_match,"\n")
-
-		new = []
+		num_order = [(num,handled_result[0][num]['object']) for num in re.findall(r"[0-9]+",handled_result[1])]
+		# print(num_order,"\n")
 
 		if len(models) == len(handled_result[0]):
-			for index,i in enumerate(models):
-				for m,obj in to_match[index][1]:
-					if m == i:
-						handled_result[1] = re.sub(to_match[index][0],m,handled_result[1])
-						new.append((index,obj))
-						break
+			for index,element in enumerate(models):
 
-		print(handled_result[1],"\n")
+				for t,obj in num_order[index][1]:
+					if t == element:
+						handled_result[0][num_order[index][0]]["object"] = obj
+						handled_result[1] = re.sub(num_order[index][0],t,handled_result[1])
 
-		print(new,"\n")
+		# print(handled_result,"\n")
 
-		replys = dict(re.findall(r"([0-9]+)\.(\w+)",model[1]["reply"]))
-		print(replys)
+		new = [handled_result[0][num]["object"] for num in re.findall(r"[0-9]+",handled_result[2])]
+		# print(new,"\n")
 
-		for num,obj in new:
-			model[1]["reply"] = re.sub(rf"{num}.{replys[str(num)]}",getattr(obj,replys[str(num)]),model[1]["reply"])
+		all_replys = []
 
-		print(model[1]["reply"])
+		if handled_result[1] == model[0]:
+			# print("# match:",model[0])
 
+			for freply in model[1]["reply"]:
+				r = freply
+				for num,attr in re.findall(r"([0-9]+)\.(\w+)",r):
+					r = re.sub(f"{num}.{attr}",getattr(new[int(num)],attr),r)
+
+				# print(r)
+				all_replys.append(r)
+
+		return all_replys
+
+	def search(self,handled_result):
+		all_replys = []
+		for element in Model.ALL_MODEL:
+			result = self.match(handled_result,element)
+			if result != []:
+				all_replys = all_replys + result
+
+		return all_replys
+
+
+
+
+
+def auto_reply(string):
+	string = string.lower()
+
+	# ['apple', 'eat', 'an', 'i']
+	all_word_list = sorted(list(set(re.findall(r"\b\w+\b",string))),key=lambda x:x.__len__(),reverse=True)
+
+	dictionary = dict()
+
+	for index,word in enumerate(all_word_list):
+		string = re.sub(word,str(index),string)
+		dictionary[str(index)] = {"name":word,"object":list()}
+
+		for word_obj in Words.WORD_LIST:
+			for pro in Words.W_PROPERTY:
+				if word == getattr(word_obj,pro):
+					dictionary[str(index)]["object"].append((f"{word_obj.wp}{pro}",word_obj))
+
+	handled_result = [dictionary,string,string]
+
+
+	model = Model()
+	return random.choice(model.search(handled_result))
 
 
 string = "I eat an apple."
 
-string = string.lower()
-
-pattern_word = r"\b\w+\b"
-
-# ['apple', 'eat', 'an', 'i']
-all_word_list = sorted(list(set(re.findall(pattern_word,string))),key=lambda x:x.__len__(),reverse=True)
-
-dictionary = dict()
-
-for index,word in enumerate(all_word_list):
-	string = re.sub(word,str(index),string)
-	dictionary[str(index)] = {"name":word,"object":list()}
-
-	for word_obj in Words.WORD_LIST:
-		for pro in Words.W_PROPERTY:
-			if word == getattr(word_obj,pro):
-				dictionary[str(index)]["object"].append((f"{word_obj.wp}{pro}",word_obj))
-
-
-handled_result = [dictionary,string]
-
-print(handled_result,"\n")
-
-model = Model()
-model.search(handled_result)
-
-
-
-
+print(auto_reply(string))
 
 
 
@@ -219,9 +239,9 @@ model.search(handled_result)
 # 		model_appearence = turned_model[0]
 # 		model_reply = turned_model[1]
 
-# 		print("")
-# 		print(deal_string)
-# 		print(model_appearence)
+		# print("")
+		# print(deal_string)
+		# print(model_appearence)
 
 # 		# above all
 # 		# judge whether the model_appearence's length is the same to deal_string's length
@@ -238,11 +258,11 @@ model.search(handled_result)
 # 						return False
 
 # 				elif str(type(fg)) == "<class 'str'>":
-# 					print("str type element")
+					# print("str type element")
 # 					return False
 
 # 		else:
-# 			print("the lengths are different!")
+			# print("the lengths are different!")
 # 			return False
 
 # 		return model_reply
@@ -257,7 +277,7 @@ model.search(handled_result)
 # 	the program will walk the whole tuple
 # 	'''
 
-# 	print(string)
+	# print(string)
 
 # 	result = []
 
@@ -306,13 +326,13 @@ model.search(handled_result)
 # 						# wo represents its Word Object
 
 # 		if result[index] == []:
-# 			print(f"{word} is unknown,so I turn the list into string")
+			# print(f"{word} is unknown,so I turn the list into string")
 # 			result[index] = word
 
 # 		elif result[index] != []:
-# 			print(f"'{word} it has {len(result[index])} meaning,so we create{result[index]}")
+			# print(f"'{word} it has {len(result[index])} meaning,so we create{result[index]}")
 
-# 	print("")
+	# print("")
 
 # 	return result
 
@@ -325,23 +345,23 @@ model.search(handled_result)
 # 	# Like "i eat an apple"
 # 	# but we should lower
 # 	string = string
-# 	print(string,"\n")
+	# print(string,"\n")
 
 
 # 	# (2)
 # 	# turn the data into global format
 # 	# but global format is not fit to splited s_expression
 # 	deal_string = format_glo(string)
-# 	print("final result is:",deal_string,"\n")
+	# print("final result is:",deal_string,"\n")
 
 
 # 	# (3)
 # 	model = Model()
-# 	print("Loading all the models: ",model.ALL_MODEL)
+	# print("Loading all the models: ",model.ALL_MODEL)
 
 
 # 	# (4)
-# 	print(model.match(deal_string,model.ALL_MODEL[1]))
+	# print(model.match(deal_string,model.ALL_MODEL[1]))
 # 	# the model I choose the first for now
 
 
@@ -461,7 +481,7 @@ model.search(handled_result)
 
 # 		((('1', 'pron.', 'split'), ('1', 'v.', 'split'), ('1', 'art.', 'split'), ('1', 'n.', 'split')), 'yes, $1pron.antisense$ $1v.split$')
 # 		'''
-# 		print(format_model)
+		# print(format_model)
 
 
 # 		if len(format_string) == len(format_model[0]):
@@ -490,7 +510,7 @@ model.search(handled_result)
 # 		for format_model in self.MODEL_ALL:
 # 			result = self.match(format_string,format_model)
 # 			if result != None:
-# 				print(result)
+				# print(result)
 # 				fit.append(result)
 
 # 		return tuple(fit)
@@ -502,11 +522,11 @@ model.search(handled_result)
 
 # 		'''
 
-# 		print(format_info)
-# 		print(reply_s_expession)
+		# print(format_info)
+		# print(reply_s_expession)
 
 # 		needto_sub = dict(re.findall(r"\$([0-9]+\w+\.)(\w+)\$",reply_s_expession))
-# 		# print(needto_sub)
+		# print(needto_sub)
 
 # 		for replaced in needto_sub:
 # 			'''
@@ -523,12 +543,12 @@ model.search(handled_result)
 		
 
 # def auto_reply(string):
-# 	# print(format_string("I love eating apples"))
+	# print(format_string("I love eating apples"))
 # 	string = format_string(string)
-# 	print(string)
+	# print(string)
 
 # 	model = Model()
-# 	print("all the models",model.MODEL_ALL)
+	# print("all the models",model.MODEL_ALL)
 
 # 	all_reply = []
 
@@ -542,7 +562,7 @@ model.search(handled_result)
 
 
 # if __name__ == '__main__':
-# 	print(auto_reply("I love eating you"))
+	# print(auto_reply("I love eating you"))
 
 
 
